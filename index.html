@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+    <title>Document</title>
+    <style>
+        body, html{
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-size: cover;
+            background-position: center;
+        }
+        h1{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .container{
+            background-color: #ffffff99;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 50%;
+            height: 60%;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        
+        
+        function main(sehir){
+            const key = "c8b87e6ee1c062266ae0adcb2f923e27"
+            const api = `https://api.openweathermap.org/data/2.5/weather`
+
+            if(sehir)
+            {
+                city = sehir.toLowerCase().replace(" ", "%20")
+                city[0].toUpperCase()
+            }    
+            else
+            {
+                var cities = ["Londra", "Paris", "Tokyo", "New York", "Moskova", "Pekin", "İstanbul","Rio de Janeiro", "Sidney", "Roma", "Kahire", "Dubai", "Berlin", "Madrid", "Atina", "Bangkok", "Cape Town", "Toronto", "Buenos Aires", "Delhi"]
+                var city = cities[Math.floor(Math.random() * cities.length)].toLowerCase().replace(" ", "%20")
+                sehir = city.replace("%20", " ")
+            }
+            console.log(city)
+            const query = `${api}?q=${city}&lang=tr&appid=${key}`
+
+            $.getJSON(query, function(data){
+                const body = $("body")
+                body.html("")
+                body.append(`
+                <style>
+                    body{
+                        background-image: url("img/${data["weather"][0]["icon"]}.jpg");
+                    }
+                    </style>`)
+                body.append(`
+                <div class='container'>
+                    <div>
+                        <h1>
+                            ${data["name"]} / ${data["sys"]["country"]} 
+                            <img src='https://openweathermap.org/img/w/${data["weather"][0]["icon"]}.png'>
+                        </h1>
+                        <h3>${data["weather"][0]["description"]}</h3>
+                    </div>
+                    <div>
+                        <form  style='display: flex; flex-direction: column;'>
+                            <h2>Şehrinizi Giriniz</h2>
+                            <input type='text' id="city" value='${sehir}'>
+                            <button id='find'>Şehrimi Bul</button>
+                            <span style='color: red;'>Eğer şehir ismi girmezseniz<br>rastegele bir şehir görüntülenir.</span>
+                        </form>
+                    </div>
+                </div>
+                `)
+                //Form Submit olayında sayfanın yenilenmesini engeller
+                var form = document.querySelector("form");
+                function submitForm(event){
+                    event.preventDefault();
+                }
+                form.addEventListener("submit", submitForm)
+
+                $("form").submit(function(){
+                    main($("input").val().toLowerCase())
+                })
+
+            })       
+        }
+        main()
+
+        
+    </script>
+</body>
+</html>
